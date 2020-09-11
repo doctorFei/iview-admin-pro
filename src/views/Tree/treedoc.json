@@ -1,0 +1,174 @@
+{
+  "success": true,
+  "errorCode": "00000000",
+  "errorMessage": null,
+  "data": [
+    {
+      "id": "18",
+      "type": "catalog",
+      "name": "语音",
+      "labelGroup": false,
+      "label": null,
+      "labelId": null,
+      "children": [],
+      "catalogId": 18
+    },
+    {
+      "id": "75",
+      "type": "catalog",
+      "name": "测试一级目录",
+      "labelGroup": false,
+      "label": null,
+      "labelId": null,
+      "children": [
+        {
+          "id": "79",
+          "type": "catalog",
+          "name": "你看这个目录",
+          "labelGroup": false,
+          "label": null,
+          "labelId": null,
+          "children": [],
+          "catalogId": null
+        },
+        {
+          "id": "76",
+          "type": "catalog",
+          "name": "测试二级目录",
+          "labelGroup": false,
+          "label": null,
+          "labelId": null,
+          "children": [
+            {
+              "id": "1596781541955",
+              "type": "ability",
+              "name": "语音听写",
+              "labelGroup": true,
+              "label": null,
+              "labelId": null,
+              "children": [
+                {
+                  "id": "1587086574227vuy13234234",
+                  "type": "ability",
+                  "name": "语音听写",
+                  "labelGroup": false,
+                  "label": "东莞",
+                  "labelId": 4,
+                  "children": [],
+                  "catalogId": 77
+                },
+                {
+                  "id": "158709059999023424o9d7",
+                  "type": "ability",
+                  "name": "语音听写",
+                  "labelGroup": false,
+                  "label": "杭州",
+                  "labelId": 4,
+                  "children": [],
+                  "catalogId": 77
+                }
+              ],
+              "catalogId": null
+            }
+          ]
+        },
+        {
+          "id": "77",
+          "type": "catalog",
+          "name": "测试二级目录1",
+          "labelGroup": false,
+          "label": null,
+          "labelId": null,
+          "children": [
+            {
+              "id": "1596781541955",
+              "type": "ability",
+              "name": "语音听写",
+              "labelGroup": true,
+              "label": null,
+              "labelId": null,
+              "children": [
+                {
+                  "id": "1587086574227vuy1",
+                  "type": "ability",
+                  "name": "语音听写",
+                  "labelGroup": false,
+                  "label": "东莞",
+                  "labelId": 4,
+                  "children": [],
+                  "catalogId": 77
+                },
+                {
+                  "id": "1587090599990o9d7",
+                  "type": "ability",
+                  "name": "语音听写",
+                  "labelGroup": false,
+                  "label": "杭州",
+                  "labelId": 4,
+                  "children": [],
+                  "catalogId": 77
+                }
+              ],
+              "catalogId": null
+            }
+          ],
+          "catalogId": null
+        },
+        {
+          "id": "1596781541938",
+          "type": "ability",
+          "name": "语音听写",
+          "labelGroup": true,
+          "label": null,
+          "labelId": null,
+          "children": [
+            {
+              "id": "15879850966692233",
+              "type": "ability",
+              "name": "语音听写",
+              "labelGroup": false,
+              "label": "广东",
+              "labelId": 1,
+              "children": [
+                {
+                  "id": "159158572953979",
+                  "type": "doc",
+                  "name": "语音听写WebAPI 文档",
+                  "labelGroup": false,
+                  "label": null,
+                  "labelId": null,
+                  "children": null,
+                  "catalogId": null
+                }
+              ],
+              "catalogId": 75
+            },
+            {
+              "id": "1587985096669tq7a",
+              "type": "ability",
+              "name": "语音听写",
+              "labelGroup": false,
+              "label": "上海",
+              "labelId": 2,
+              "children": [
+                {
+                  "id": "1591585710503ze",
+                  "type": "doc",
+                  "name": "非实时语言转写WebAPI文档",
+                  "labelGroup": false,
+                  "label": null,
+                  "labelId": null,
+                  "children": null,
+                  "catalogId": null
+                }
+              ],
+              "catalogId": 75
+            }
+          ],
+          "catalogId": null
+        }
+      ],
+      "catalogId": 75
+    }
+  ]
+}

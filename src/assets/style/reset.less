@@ -1,0 +1,51 @@
+/* 通配符修改重设内外边距 */
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* body全局字体设置 */
+body {
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #333;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* 去除元素的focus状态时的边线 */
+input, textarea, button, a {
+  outline: 0;
+}
+
+/* 清除列表的默认样式 */
+ul, ol {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+li {
+  list-style: none;
+}
+
+/* 将部分元素初始化为块级元素 */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
+  display: block;
+}
+
+/* 去除默认斜体样式*/
+i {
+  font-style: unset;
+}
+
+/* 去除a链接下划线 */
+a {
+  text-decoration: none;
+  color: #000000;
+}
+
+/* 清除表单Input输入框以及textarea的浏览器默认样式 */
+input[type=text], input[type=password], input[type=number], input[type=tel], input[type=email], textarea {
+  -webkit-appearance: none;
+}

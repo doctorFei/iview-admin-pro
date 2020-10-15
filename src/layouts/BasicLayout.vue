@@ -1,9 +1,12 @@
 <template>
-  <Layout :class="[`nav-theme-${navTheme}`,`nav-layout-${navLayout}`]" style="height: 100%">
+  <Layout
+    :class="[`nav-theme-${navTheme}`, `nav-layout-${navLayout}`]"
+    style="height: 100%"
+  >
     <Sider
       ref="side"
       class="side-wrap"
-      v-if="navLayout==='left'"
+      v-if="navLayout === 'left'"
       hide-trigger
       :width="256"
       :collapsed-width="64"
@@ -20,20 +23,23 @@
       </side-menu>
     </Sider>
     <Layout>
-      <Header class="layout-header-bar flex items-center" style="padding-left: 0;display: flex">
+      <Header
+        class="layout-header-bar flex items-center"
+        style="padding-left: 0; display: flex"
+      >
         <Icon
           @click.native="collapsedSider"
           style="cursor: pointer"
-          v-if="navLayout==='left'"
+          v-if="navLayout === 'left'"
           :class="rotateIcon"
-          :style="{margin: '0 20px'}"
+          :style="{ margin: '0 20px' }"
           type="md-menu"
           size="24"
         />
         <MyHeader />
       </Header>
-      <Content :style="{margin: '20px', minHeight: '260px'}">
-        <router-view style="background: #ffffff;padding: 20px"></router-view>
+      <Content :style="{ margin: '20px', minHeight: '260px' }">
+        <router-view style="background: #ffffff; padding: 20px"></router-view>
       </Content>
     </Layout>
     <SettingDrawer />

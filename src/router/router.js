@@ -211,6 +211,15 @@ export const asyncRoutes = [
               roles: ['admin']
             },
             component: () => import('../views/Editor/identification')
+          },
+          {
+            path: '/editor/svgAnimation',
+            name: 'svgAnimation',
+            meta: {
+              title: 'svg',
+              roles: ['admin']
+            },
+            component: () => import('../views/Editor/svgDemo2')
           }
         ]
       }

@@ -1,39 +1,39 @@
 <template>
-  <Tree :data="treeData" :render="renderFunc"></Tree>
+  <Tree :data="folderTree" :render="renderFunc"></Tree>
 </template>
 
 <script>
+import {
+  putFileInFolder,
+  transferFolderToTree,
+  expandSpecifiedFolder,
+} from "@/libs/utils";
+import clonedeep from "clonedeep";
 export default {
-  name: 'FolderTree',
-  data () {
+  name: "FolderTree",
+  data() {
     return {
-      currentRenamingId: '', // 编辑状态唯一id
-      currentRenamingContent: '',
+      folderTree: [],
+      currentRenamingId: "",
+      currentRenamingContent: "",
       renderFunc: (h, { root, node, data }) => {
         const dropList =
-          data.type === 'folder' ? this.folderDrop : this.fileDrop
-        const dropdownRender = dropList.map(item => {
-          return <dropdownItem name={item.name}>{item.title}</dropdownItem>
-        })
+          data.type === "folder" ? this.folderDrop : this.fileDrop;
+        const dropdownRender = dropList.map((item) => {
+          return <dropdownItem name={item.name}>{item.title}</dropdownItem>;
+        });
         const isRenaming =
-          this.currentRenamingId === `${data.type || 'file'}_${data.nodeKey}`
+          this.currentRenamingId === `${data.type || "file"}_${data.id}`;
         return (
-          <div
-            class="tree-item"
-            on-click={this.onNodeSelect.bind(this, { root, node, data })}
-          >
-            {data.type === 'folder' ? (
+          <div class="tree-item">
+            {data.type === "folder" ? (
               <icon
                 type="ios-folder"
                 color="#2d8cf0"
                 style="margin-right: 10px;"
               />
             ) : (
-              <icon
-                type="ios-document"
-                color="#ffe894"
-                style="margin-right: 10px;"
-              />
+              ""
             )}
             {isRenaming ? (
               <span>
@@ -49,7 +49,7 @@ export default {
                 >
                   <icon type="md-checkmark" />
                 </i-button>
-                <i-button size="small" type="text" on-click={this.closeRename}>
+                <i-button on-click={this.closeRename} size="small" type="text">
                   <icon type="md-close" />
                 </i-button>
               </span>
@@ -59,12 +59,7 @@ export default {
             {dropList && !isRenaming ? (
               <dropdown
                 placement="right-start"
-                on-on-click={this.handleDropdownClick.bind(
-                  this,
-                  root,
-                  node,
-                  data
-                )}
+                on-on-click={this.handleDropdownClick.bind(this, data)}
               >
                 <i-button size="small" type="text" class="tree-item-button">
                   <icon type="md-more" size={12} />
@@ -72,104 +67,121 @@ export default {
                 <dropdownMenu slot="list">{dropdownRender}</dropdownMenu>
               </dropdown>
             ) : (
-              ''
+              ""
             )}
           </div>
-        )
-      }
-    }
+        );
+      },
+    };
   },
   props: {
     folderList: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     fileList: {
       type: Array,
-      default: () => []
-    },
-    treeData: {
-      type: Array,
-      default: () => []
+      default: () => [],
     },
     folderDrop: Array,
     fileDrop: Array,
     beforeDelete: Function,
-    beforeRename: Function
+  },
+  watch: {
+    folderList() {
+      this.transData();
+    },
+    fileList() {
+      this.transData();
+    },
   },
   methods: {
-    isFolder (type) {
-      return type === 'folder'
+    transData() {
+      this.folderTree = transferFolderToTree(
+        putFileInFolder(this.folderList, this.fileList)
+      );
     },
-    handleDropdownClick (root, node, data, name) {
-      if (name === 'rename') {
-        this.currentRenamingId = `${data.type || 'file'}_${data.nodeKey}`
-      } else if (name === 'delete') {
+    isFolder(type) {
+      return type === "folder";
+    },
+    handleDelete(data) {
+      const folderId = data.folder_id;
+      const isFolder = this.isFolder(data.type);
+      const updateListName = isFolder ? "folderList" : "fileList";
+      let list = isFolder
+        ? clonedeep(this.folderList)
+        : clonedeep(this.fileList);
+      list = list.filter((item) => item.id !== data.id);
+      this.$emit(`update:${updateListName}`, list);
+      this.$nextTick(() => {
+        expandSpecifiedFolder(this, this.folderTree, folderId);
+      });
+    },
+    handleDropdownClick(data, name) {
+      if (name === "rename") {
+        this.currentRenamingId = `${data.type || "file"}_${data.id}`;
+      } else if (name === "delete") {
         this.$Modal.confirm({
-          title: '提示',
+          title: "提示",
           content: `您确定要删除${
-            this.isFolder(data.type) ? '文件夹' : '文件'
+            this.isFolder(data.type) ? "文件夹" : "文件"
           }《${data.title}》吗？`,
           onOk: () => {
-            this.handleDelete(root, node, data)
-          }
-        })
+            this.beforeDelete
+              ? this.beforeDelete()
+                  .then(() => {
+                    this.handleDelete(data);
+                  })
+                  .catch(() => {
+                    this.$Message.error("删除失败");
+                  })
+              : this.handleDelete(data);
+          },
+        });
       }
     },
-    onNodeSelect ({ root, node, data }) {
-      this.$emit('on-node-select', { root, node, data })
+    handleInput(value) {
+      this.currentRenamingContent = value;
     },
-    handleInput (value) {
-      this.currentRenamingContent = value
+    updateList(list, id) {
+      let i = -1;
+      const len = list.length;
+      while (++i < len) {
+        const folderItem = list[i];
+        if (folderItem.id === id) {
+          folderItem.name = this.currentRenamingContent;
+          list.splice(i, 1, folderItem);
+          break;
+        }
+      }
+      return list;
     },
-    closeRename () {
-      this.currentRenamingId = ''
-    },
-    saveRename (data) {
-      if (this.beforeRename) {
-        this.beforeRename(data, this.currentRenamingContent)
-          .then(() => {
-            // data保持了树的引用关系,所以直接修改可以实现响应式
-            data.title = this.currentRenamingContent
-            this.$Message.success('重命名成功')
-          })
-          .catch(() => {
-            this.$Message.error('重命名失败')
-          })
-          .finally(() => {
-            this.currentRenamingId = ''
-          })
+    saveRename(data) {
+      const id = data.id;
+      const type = data.type;
+      if (type === "folder") {
+        const list = this.updateList(clonedeep(this.folderList), id);
+        this.$emit("update:folderList", list);
       } else {
-        data.title = this.currentRenamingContent
-        this.currentRenamingId = ''
+        const list = this.updateList(this.fileList, id);
+        this.$emit("update:fileList", list);
       }
+      this.currentRenamingId = "";
     },
-    handleDelete (root, node, data, e) {
-      if (this.beforeDelete) {
-        this.beforeDelete()
-          .then(() => {
-            this.remove(root, node, data)
-          })
-          .catch(() => {
-            this.$Message.error('删除失败')
-          })
-      } else {
-        this.remove(root, node, data)
-      }
+    closeRename() {
+      this.currentRenamingId = "";
     },
-    remove (root, node, data) {
-      const parentKey = root.find(el => el === node).parent
-      const parent = root.find(el => el.nodeKey === parentKey).node
-      const index = parent.children.indexOf(data)
-      parent.children.splice(index, 1)
-    }
-  }
-}
+  },
+  mounted() {
+    this.transData();
+  },
+};
 </script>
 
 <style lang="less">
 .tree-item {
   display: inline-block;
+  width: 100%;
   height: 30px;
   line-height: 30px;
   & > .ivu-dropdown {

@@ -1,9 +1,12 @@
 <template>
-  <Layout :class="[`nav-theme-${navTheme}`,`nav-layout-${navLayout}`]" style="height: 100%">
+  <Layout
+    :class="[`nav-theme-${navTheme}`, `nav-layout-${navLayout}`]"
+    style="height: 100%"
+  >
     <Sider
       ref="side"
       class="side-wrap"
-      v-if="navLayout==='left'"
+      v-if="navLayout === 'left'"
       hide-trigger
       :width="256"
       :collapsed-width="64"
@@ -20,20 +23,35 @@
       </side-menu>
     </Sider>
     <Layout>
-      <Header class="layout-header-bar flex items-center" style="padding-left: 0;display: flex">
+      <Header
+        class="layout-header-bar flex items-center"
+        style="padding-left: 0; display: flex"
+      >
         <Icon
           @click.native="collapsedSider"
           style="cursor: pointer"
-          v-if="navLayout==='left'"
+          v-if="navLayout === 'left'"
           :class="rotateIcon"
-          :style="{margin: '0 20px'}"
+          :style="{ margin: '0 20px' }"
           type="md-menu"
           size="24"
         />
         <MyHeader />
       </Header>
-      <Content :style="{margin: '20px', minHeight: '260px'}">
-        <router-view style="background: #ffffff;padding: 20px"></router-view>
+      <Content class="content-con">
+        <Tabs
+          @on-click="handleClickTab"
+          type="card"
+          :value="getTabNameByRoute($route)"
+        >
+          <TabPane
+            :label="labelRender(item)"
+            :name="getTabNameByRoute(item)"
+            v-for="(item, index) in tabList"
+            :key="`tabNav${index}`"
+          ></TabPane>
+        </Tabs>
+        <router-view style="background: #ffffff; padding: 20px"></router-view>
       </Content>
     </Layout>
     <SettingDrawer />
@@ -41,84 +59,125 @@
 </template>
 
 <script>
-import MyHeader from "@/layouts/Header";
-import SideMenu from "@/layouts/SideMenu/SideMenu";
-import SettingDrawer from "_c/SettingDrawer";
-import { mapState } from "vuex";
+import MyHeader from '@/layouts/Header'
+import SideMenu from '@/layouts/SideMenu/SideMenu'
+import SettingDrawer from '_c/SettingDrawer'
+import { mapState, mapMutations, mapActions } from 'vuex'
+import { getTabNameByRoute, getRouteById } from '@/libs/utils'
 
 export default {
-  name: "BasicLayout",
+  name: 'BasicLayout',
   components: {
     MyHeader,
     SideMenu,
-    SettingDrawer,
+    SettingDrawer
   },
-  mounted() {
+  mounted () {
     this.$nextTick(() => {
-      const _this = this;
+      const _this = this
       if (document.documentElement.clientWidth <= 1366) {
         // html标签
-        _this.isCollapsed = true;
+        _this.isCollapsed = true
       }
-    });
+    })
   },
-  data() {
+  data () {
     return {
       isCollapsed: false, // 收缩属性
       menuData: null,
-    };
+      getTabNameByRoute
+    }
   },
   computed: {
     ...mapState({
       routes: (state) => state.permission.routes,
+      tabList: (state) => state.tabNav.tabList
     }),
-    rotateIcon() {
-      return ["menu-icon", this.isCollapsed ? "rotate-icon" : ""];
+    rotateIcon () {
+      return ['menu-icon', this.isCollapsed ? 'rotate-icon' : '']
     },
-    navTheme() {
-      return this.$route.query.navTheme || "light";
+    navTheme () {
+      return this.$route.query.navTheme || 'dark'
     },
-    navLayout() {
-      return this.$route.query.navLayout || "left";
-    },
+    navLayout () {
+      return this.$route.query.navLayout || 'left'
+    }
   },
   watch: {
     routes: {
-      handler(v) {
-        this.menuData = this.getMenuData(v);
+      handler (v) {
+        this.menuData = this.getMenuData(v)
       },
       deep: true,
-      immediate: true,
+      immediate: true
     },
+    $route: {
+      handler (v) {
+        this.UPDATE_ROUTER(v)
+      },
+      immediate: true
+    }
   },
   methods: {
-    collapsedSider() {
-      this.$refs.side.toggleCollapse();
+    ...mapMutations(['UPDATE_ROUTER']),
+    ...mapActions(['handleRemove']),
+    collapsedSider () {
+      this.$refs.side.toggleCollapse()
     },
-    getMenuData(routes) {
-      const menuData = [];
+    getMenuData (routes) {
+      const menuData = []
       !!routes &&
         routes.forEach((item) => {
           // 有name
           if (item.name && !item.hideInMenu) {
-            const newItem = { ...item };
-            delete newItem.children;
+            const newItem = { ...item }
+            delete newItem.children
             if (!item.hideChildrenMenu) {
-              newItem.children = this.getMenuData(item.children);
+              newItem.children = this.getMenuData(item.children)
             }
-            menuData.push(newItem);
+            menuData.push(newItem)
           } else if (
             !item.hideInMenu &&
             !item.hideChildrenMenu &&
             item.children
           ) {
-            menuData.push(...this.getMenuData(item.children));
+            menuData.push(...this.getMenuData(item.children))
           }
-        });
-      return menuData;
+        })
+      return menuData
     },
-  },
-};
+    handleClickTab (id) {
+      const route = getRouteById(id)
+      this.$router.push(route)
+    },
+    handleTabRemove (id, event) {
+      event.stopPropagation()
+      this.handleRemove({
+        id,
+        $route: this.$route
+      }).then((nextRoute) => {
+        this.$router.push(nextRoute)
+      })
+    },
+    labelRender (item) {
+      return (h) => {
+        return (
+          <div>
+            <span>{item.meta.title}</span>
+            <icon
+              nativeOn-click={this.handleTabRemove.bind(
+                this,
+                getTabNameByRoute(item)
+              )}
+              type="md-close-circle"
+              style="line-height:10px;"
+            ></icon>
+          </div>
+        )
+      }
+    }
+  }
+}
 </script>
 
 <style scoped lang="less">
@@ -176,7 +235,8 @@ export default {
   height: 60px;
   text-align: center;
   line-height: 60px;
-  font-size: 18px;
+  font-size: 24px;
+  color: #2d8cf0 !important;
 }
 
 .nav-theme-light {
@@ -207,6 +267,15 @@ export default {
     .slider-title {
       color: #ffffff;
     }
+  }
+}
+.content-con {
+  padding: 0;
+  .ivu-tabs-bar {
+    margin-bottom: 0;
+  }
+  .view-box {
+    padding: 0;
   }
 }
 </style>

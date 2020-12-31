@@ -1,183 +1,72 @@
 <template>
-  <Tree :data="data5" :render="renderContent" class="demo-tree-render"></Tree>
+  <div class="folder-wrapper">
+    <!-- <Tree :data="folderTree" :render="renderFunc"></Tree> -->
+    <folder-tree
+      :folder-list.sync="folderList"
+      :file-list.sync="fileList"
+      :folder-drop="folderDrop"
+      :file-drop="fileDrop"
+      :beforeDelete="beforeDelete"
+    />
+  </div>
 </template>
+
 <script>
+import { getFolderList, getFileList } from '@/api/tree'
+import FolderTree from '_c/FolderTree'
 export default {
+  components: {
+    FolderTree
+  },
   data () {
     return {
-      data5: [
+      folderList: [],
+      fileList: [],
+      folderDrop: [
         {
-          title: 'parent 1',
-          expand: true,
-          render: (h, { root, node, data }) => {
-            return h(
-              'span',
-              {
-                style: {
-                  display: 'inline-block',
-                  width: '100%'
-                }
-              },
-              [
-                h('span', [
-                  h('Icon', {
-                    props: {
-                      type: 'ios-folder-outline'
-                    },
-                    style: {
-                      marginRight: '8px'
-                    }
-                  }),
-                  h('span', data.title)
-                ]),
-                h(
-                  'span',
-                  {
-                    style: {
-                      display: 'inline-block',
-                      float: 'right',
-                      marginRight: '32px'
-                    }
-                  },
-                  [
-                    h('Button', {
-                      props: Object.assign({}, this.buttonProps, {
-                        icon: 'ios-add',
-                        type: 'primary'
-                      }),
-                      style: {
-                        width: '64px'
-                      },
-                      on: {
-                        click: () => {
-                          this.append(data)
-                        }
-                      }
-                    })
-                  ]
-                )
-              ]
-            )
-          },
-          children: [
-            {
-              title: 'child 1-1',
-              expand: true,
-              children: [
-                {
-                  title: 'leaf 1-1-1',
-                  expand: true
-                },
-                {
-                  title: 'leaf 1-1-2',
-                  expand: true
-                }
-              ]
-            },
-            {
-              title: 'child 1-2',
-              expand: true,
-              children: [
-                {
-                  title: 'leaf 1-2-1',
-                  expand: true
-                },
-                {
-                  title: 'leaf 1-2-1',
-                  expand: true
-                }
-              ]
-            }
-          ]
+          name: 'rename',
+          title: '重命名'
+        },
+        {
+          name: 'delete',
+          title: '删除文件夹'
         }
       ],
-      buttonProps: {
-        type: 'default',
-        size: 'small'
-      }
+      fileDrop: [
+        {
+          name: 'rename',
+          title: '重命名'
+        },
+        {
+          name: 'delete',
+          title: '删除文件'
+        }
+      ]
     }
   },
   methods: {
-    renderContent (h, { root, node, data }) {
-      console.log(root)
-      return h(
-        'span',
-        {
-          style: {
-            display: 'inline-block',
-            width: '100%'
-          }
-        },
-        [
-          h('span', [
-            h('Icon', {
-              props: {
-                type: 'ios-paper-outline'
-              },
-              style: {
-                marginRight: '8px'
-              }
-            }),
-            h('span', data.title)
-          ]),
-          h(
-            'span',
-            {
-              style: {
-                display: 'inline-block',
-                float: 'right',
-                marginRight: '32px'
-              }
-            },
-            [
-              h('Button', {
-                props: Object.assign({}, this.buttonProps, {
-                  icon: 'ios-add'
-                }),
-                style: {
-                  marginRight: '8px'
-                },
-                on: {
-                  click: () => {
-                    this.append(data)
-                  }
-                }
-              }),
-              h('Button', {
-                props: Object.assign({}, this.buttonProps, {
-                  icon: 'ios-remove'
-                }),
-                on: {
-                  click: () => {
-                    this.remove(root, node, data)
-                  }
-                }
-              })
-            ]
-          )
-        ]
-      )
-    },
-    append (data) {
-      const children = data.children || []
-      children.push({
-        title: 'appended node',
-        expand: true
+    beforeDelete () {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          const error = null
+          if (!error) {
+            resolve()
+          } else reject(error)
+        }, 2000)
       })
-      this.$set(data, 'children', children)
-    },
-    remove (root, node, data) {
-      console.log(root)
-      const parentKey = root.find((el) => el === node).parent
-      const parent = root.find((el) => el.nodeKey === parentKey).node
-      const index = parent.children.indexOf(data)
-      parent.children.splice(index, 1)
     }
+  },
+  mounted () {
+    Promise.all([getFolderList(), getFileList()]).then((res) => {
+      this.folderList = res[0].data
+      this.fileList = res[1].data
+    })
   }
 }
 </script>
-<style>
-.demo-tree-render .ivu-tree-title {
-  width: 100%;
+
+<style lang="less">
+.folder-wrapper {
+  width: 300px;
 }
 </style>

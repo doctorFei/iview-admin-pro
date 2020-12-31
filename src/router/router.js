@@ -185,32 +185,61 @@ export const asyncRoutes = [
             },
             component: () => import('../views/Editor/tinymce')
           },
-          // {
-          //   path: '/editor/atlas',
-          //   name: 'atlas',
-          //   meta: {
-          //     title: '知识图谱',
-          //     roles: ['admin', 'editor']
-          //   },
-          //   component: () => import('../views/Editor/Atlas')
-          // },
+          {
+            path: '/editor/atlas',
+            name: 'atlas',
+            meta: {
+              title: '知识图谱',
+              roles: ['admin', 'editor']
+            },
+            component: () => import('../views/Editor/Atlas')
+          },
           {
             path: '/editor/flow',
             name: 'flow',
             meta: {
-              title: '流程图',
+              title: 'DAG',
               roles: ['admin']
             },
             component: () => import('../views/Editor/Flow')
+          }
+        ]
+      }, {
+        path: 'mark-tool',
+        name: 'mark-tool',
+        meta: {
+          title: '标注工具',
+          icon: 'ios-appstore-outline',
+          roles: ['admin', 'editor']
+        },
+        component: { render: h => h('router-view') },
+        children: [
+          {
+            path: '/mark-tool/audio',
+            name: '/mark-tool-audio',
+            meta: {
+              title: '音频标注',
+              roles: ['admin', 'editor']
+            },
+            component: () => import('../views/MarkTool/AudioTag/index.vue')
           },
           {
-            path: '/editor/identification',
-            name: 'identification',
+            path: '/mark-tool/video',
+            name: '/mark-tool-video',
             meta: {
-              title: '物品识别',
-              roles: ['admin']
+              title: '视频标注',
+              roles: ['admin', 'editor']
             },
-            component: () => import('../views/Editor/identification')
+            component: () => import('../views/MarkTool/VideoTag/index.vue')
+          },
+          {
+            path: '/mark-tool/image-semantic',
+            name: '/mark-tool-image-semantic',
+            meta: {
+              title: '图片语义分割',
+              roles: ['admin', 'editor']
+            },
+            component: () => import('../views/MarkTool/ImageSemantic/index.vue')
           }
         ]
       }

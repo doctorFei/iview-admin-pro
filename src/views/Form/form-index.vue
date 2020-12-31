@@ -4,28 +4,13 @@
       <p>在表单项上的trigger触发验证实际上调用的是组件内部的</p>
       <p>this.$on("on-form-blur", this.onFieldBlur)</p>
       <p>this.$on("on-form-change", this.onFieldChange)</p>
-      <p>这些订阅者的发布者实在组件库表单里由开发者自己定义的this.dispatch('FormItem', 'on-form-blur', this.currentValue)</p>
-      <p> this.$refs.imageUrlItem.onFieldChange();</p>
+      <p>
+        这些订阅者的发布者实在组件库表单里由开发者自己定义的this.dispatch('FormItem',
+        'on-form-blur', this.currentValue)
+      </p>
+      <p>this.$refs.imageUrlItem.onFieldChange();</p>
     </Alert>
 
-    <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
-      <FormItem label="citySearch" prop="citySearch">
-        <Select
-          v-model="formValidate.citySearch"
-          filterable
-          clearable
-          placeholder="Select your city"
-        >
-          <Option value="beijing">New York</Option>
-          <Option value="shanghai">London</Option>
-          <Option value="shenzhen">Sydney</Option>
-        </Select>
-      </FormItem>
-      <FormItem>
-        <Button type="primary" @click="handleSubmit('formValidate')">Submit</Button>
-        <Button @click="handleReset('formValidate')" style="margin-left: 8px">Reset</Button>
-      </FormItem>
-    </Form>
     <Alert>select封装</Alert>
     <selected-search
       v-model="selectData"
@@ -33,7 +18,7 @@
       :optionLableKey="'label'"
       :optionValKey="'value'"
     ></selected-search>
-    {{selectData}}
+    {{ selectData }}
   </div>
 </template>
 <script>
@@ -89,7 +74,7 @@ export default {
   },
   methods: {
     handleSubmit (name) {
-      this.$refs[name].validate(valid => {
+      this.$refs[name].validate((valid) => {
         if (valid) {
           this.$Message.success('Success!')
         } else {
@@ -99,11 +84,6 @@ export default {
     },
     handleReset (name) {
       this.$refs[name].resetFields()
-      // this.broadcast(
-      //   'FormItem',
-      //   'on-form-change',
-      //   this.formValidate.pathse
-      // );
     }
   }
 }

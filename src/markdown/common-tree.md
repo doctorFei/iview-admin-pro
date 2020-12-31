@@ -16,7 +16,7 @@
 
 ### 二、用法示例：
 
-详见：https://git.iflytek.com/pfwang2/deeplearntree
+详见：demo
 
 ### 三、子组件可传入参数：
 

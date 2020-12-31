@@ -1,4 +1,4 @@
-import { deepClone } from './tool'
+import { deepClone, doCustomTimes, objEqual } from './tool'
 
 // 与项目有关的公共库
 export const findNodeUpperByClasses = (ele, classes) => {
@@ -24,7 +24,7 @@ export const randomString = (len = 32) => {
   return str
 }
 
-export function param2Obj(url) {
+export function param2Obj (url) {
   const search = url.split('?')[1]
   if (!search) {
     return {}
@@ -114,4 +114,74 @@ export const expandSpecifiedFolder = (vm, folderTree, id) => {
 export const expandSpecifiedFile = (vm, folderTree, node) => {
   const parentNodeId = node.folder_id
   expandSpecifiedFolder(vm, folderTree, parentNodeId)
+}
+
+export const routeEqual = (route1, route2) => {
+  const params1 = route1.params || {}
+  const params2 = route2.params || {}
+  const query1 = route1.query || {}
+  const query2 = route2.query || {}
+  return route1.name === route2.name && objEqual(params1, params2) && objEqual(query1, query2)
+}
+
+export const routeHasExist = (tabList, routeItem) => {
+  const len = tabList.length
+  let res = false
+  doCustomTimes(len, (index) => {
+    if (routeEqual(tabList[index], routeItem)) res = true
+  })
+  return res
+}
+
+const getKeyValueArr = obj => {
+  const arr = []
+  Object.entries(obj).sort((a, b) => {
+    return a[0] - b[0]
+  }).forEach(([_key, _val]) => {
+    arr.push(_key, _val)
+  })
+  return arr
+}
+
+export const getTabNameByRoute = route => {
+  const { name, params, query } = route
+  let res = name
+  if (params && Object.keys(params).length) res += ':' + getKeyValueArr(params).join('_')
+  if (query && Object.keys(query).length) res += '&' + getKeyValueArr(query).join('_')
+  return res
+}
+
+const getObjBySplitStr = (id, splitStr) => {
+  const splitArr = id.split(splitStr)
+  const str = splitArr[splitArr.length - 1]
+  const keyValArr = str.split('_')
+  const res = {}
+  let i = 0
+  const len = keyValArr.length
+  while (i < len) {
+    res[keyValArr[i]] = keyValArr[i + 1]
+    i += 2
+  }
+  return res
+}
+
+export const getRouteById = id => {
+  const res = {}
+  if (id.includes('&')) {
+    res.query = getObjBySplitStr(id, '&')
+    id = id.split('&')[0]
+  }
+  if (id.includes(':')) {
+    res.params = getObjBySplitStr(id, ':')
+    id = id.split(':')[0]
+  }
+  res.name = id
+  return res
+}
+export const localSave = (name, value) => {
+  localStorage.setItem(name, value)
+}
+
+export const localRead = (name) => {
+  return localStorage.getItem(name)
 }

@@ -12,7 +12,7 @@
             :data="tableData"
             @on-selection-change="selectChangeHandle"
           ></Table>
-          <div style="text-align: end;padding-top: 10px">
+          <div style="text-align: end; padding-top: 10px">
             <Page
               @on-change="pageChange"
               :total="pageInfo.total"
@@ -25,12 +25,17 @@
       <Col span="4" offset="2">
         <Card>
           <p slot="title">选择列表</p>
-          <Tag
-            v-for="(item,index) in selectedList"
-            :key="item.index"
-            closable
-            @on-close="handleClose(item,index)"
-          >{{item.userName}}</Tag>
+          <template v-for="(itemArr, index) in selectedCaches">
+            <span :key="index">
+              <Tag
+                v-for="(item, index) in itemArr"
+                :key="index"
+                closable
+                @on-close="handleClose(item, index)"
+                >{{ item.userName }}</Tag
+              >
+            </span>
+          </template>
         </Card>
       </Col>
     </Row>
@@ -75,13 +80,13 @@ export default {
         page: 1
       },
       // 用户数据缓存
-      selectedList: []
+      selectedCaches: []
     }
   },
   methods: {
     async search (page = this.pageInfo.page) {
       this.tableData = await this.getTableData(page)
-      this.tableData = this.setCheckedData(this.tableData)
+      this.tableData = this.setCheckedData()
     },
     async getTableData (page) {
       const {
@@ -97,23 +102,15 @@ export default {
       this.search(page)
     },
     selectChangeHandle (selections) {
-      // 所选对象的深拷贝
-      // 先清除当前页的数据，后push
-      this.tableData.forEach(tableData => {
-        this.selectedList.forEach((item, index) => {
-          if (item.id === tableData.id) {
-            this.selectedList.splice(index, 1)
-          }
-        })
-      })
-      this.selectedList.push(...selections)
+      this.$set(this.selectedCaches, this.pageInfo.page - 1, selections)
     },
     handleClose (row, index) {
-      this.resetDataItem(row.id)
-      this.selectedList.splice(index, 1)
+      const cacheData = this.selectedCaches[this.pageInfo.page - 1]
+      cacheData.splice(index, 1)
+      this.tableData = this.setCheckedData()
     },
     resetDataItem (id) {
-      this.tableData = this.tableData.map(tabeItem => {
+      this.tableData = this.tableData.map((tabeItem) => {
         if (tabeItem.id === id) {
           tabeItem._checked = false
         }
@@ -123,15 +120,21 @@ export default {
     /**
      * 回显
      */
-    setCheckedData (data) {
-      data.forEach(tabeItem => {
-        this.selectedList.forEach(originItem => {
-          if (tabeItem.id === originItem.id) {
-            tabeItem._checked = true
-          }
+    setCheckedData () {
+      const cacheData = this.selectedCaches[this.pageInfo.page - 1]
+      if (cacheData && cacheData.length > 0) {
+        this.tableData = this.tableData.map((tabeItem) => {
+          tabeItem._checked = false
+          cacheData.some((originItem) => {
+            if (tabeItem.id === originItem.id) {
+              tabeItem._checked = true
+              return true
+            }
+          })
+          return tabeItem
         })
-      })
-      return data
+      }
+      return this.tableData
     }
   }
 }

@@ -3,7 +3,7 @@ import { login, getInfo } from '@/api/user'
 
 export default {
   state: {
-    token: getToken(),// 初始化获取cookie的token
+    token: getToken(), // 初始化获取cookie的token
     name: '',
     avatar: '',
     introduction: '',
@@ -77,6 +77,6 @@ export default {
         removeToken()
         resolve()
       })
-    },
+    }
   }
 }
